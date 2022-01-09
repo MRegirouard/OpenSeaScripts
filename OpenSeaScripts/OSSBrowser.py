@@ -243,6 +243,72 @@ class OSSBrowser:
             print("Error:", e)
             return False
 
+    def sell_asset(self, asset_link:str, price:float):
+        """
+        Sell an uploaded asset from the given URL.
+
+        Args:
+            asset_link (str): The URL of the asset to sell.
+            price (float): The price to sell the asset for.
+
+        Returns:
+            True if the asset was sold successfully, False otherwise.
+        """
+        try:
+            sell_link = asset_link
+
+            if asset_link.endswith("/"):
+                sell_link += "sell"
+            elif asset_link.endswith("/sell"):
+                pass
+            else:
+                sell_link += "/sell"
+
+            self.driver.get(sell_link) # Open the asset's sell page in the browser
+
+            self._find_element_timeout(By.CSS_SELECTOR, "input[name='price']").send_keys(str(price)) # Set the price
+
+            # TODO: Set the duration
+
+            self._find_element_timeout(By.CSS_SELECTOR, "button[type='submit']").click() # Click the sell button
+
+            before_windows = self.driver.window_handles # Get existing window handles
+            main_window = self.driver.current_window_handle # The main window handle
+
+            self._find_element_content_timeout(By.CSS_SELECTOR, "button[type='button']", "Sign").click() # Click the sign button
+
+            sign_window = None # The sign window handle. A new window is opened by MetaMask for signing the transaction
+            loop_count = 0
+
+            while sign_window is None and loop_count < 15:
+                time.sleep(0.5)
+                loop_count += 1
+
+                after_windows = self.driver.window_handles
+
+                for window in after_windows: # Check for a new window handle
+                    if window not in before_windows:
+                        sign_window = window
+                        break
+
+            if sign_window is None:
+                raise Exception("Failed to find transaction sign window") # If the sign window was not found, raise an exception
+
+            self.driver.switch_to.window(sign_window) # Focus on the sign window
+
+            self._find_element_timeout(By.CSS_SELECTOR, "button[data-testid='request-signature__sign']").click() # Click the sign button
+
+            self.driver.switch_to.window(main_window) # Focus on the main window
+
+            if self._find_element_content_timeout(By.CSS_SELECTOR, "h4", "Your NFT is listed!", timeout=15) is not None: # Check if the asset was sold successfully
+                return True
+            else:
+                raise Exception("Failed to sell asset")
+
+        except Exception as e:
+            print("Error:", e)
+            return False
+
     def get_session_data(self):
         """
         Returns the session data for this OSSBrowser instance. Used for reconnecting instead
