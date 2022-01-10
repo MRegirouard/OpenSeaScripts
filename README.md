@@ -66,6 +66,36 @@ else:
 	else:
 		print("Asset listed for sale.")
 ```
+## Easily Reconnect to Existing Browser Session
+Selenium allows you to connect to a previously opened browser session. You can use this to avoid having to sign in to MetaMask each time you run a script to upload NFT's. However, certain things must be done to ensure that the first session stays open.
+<br>
+I recommend doing this with two different Python scripts. The first will initailize the browser, print the connection info, and then keep the session open. The second will actually connect to the browser and can be restarted without closing the browser session.
+
+### StartBrowser.py
+```python3
+from OpenSeaScripts.OSSBrowser import OSSBrowser
+
+browser = OSSBrowser()
+print("Browser info:", browser.get_session_data()) # Use this info to reconnect
+
+# Keep the browser open for reconnecting
+while True:
+	pass
+```
+
+### ConnectToBrowser.py
+```python3
+from OpenSeaScripts.OSSBrowser import OSSBrowser
+
+# Browser info from StartBrowser.py
+command_executor_url = ""
+session_id = ""
+browser = OSSBrowser(command_executor_url, session_id)
+
+# Upload / Sell Assets
+```
+
+> :warning: I have noticed some issues with opening and then reconnecting to a browser in the Visual Studio Code console. I recommend you run scripts that open browser windows in a different terminal winodw.
 
 ## Future Features
 - Better error messages
