@@ -16,6 +16,7 @@ You will also need Google Chrome.
 ```python3
 from OpenSeaScripts.AssetOptions import AssetOptions
 from OpenSeaScripts.OSSBrowser import OSSBrowser
+import datetime
 
 # Create a new browser. This will open a Chrome window.
 browser = OSSBrowser()
@@ -51,7 +52,14 @@ if not result:
 	print("Upload failed.")
 else:
 	print("Uploaded asset. URL:", result)
-	sell_result = browser.sell_asset(result, 1) # List the NFT for sale using its URL for the price of 1 ETH.
+
+	sell_start = datetime.datetime(2022, 1, 13, 0, 0) # Sell duration start datetime object.
+	sell_end   = datetime.datetime(2022, 4, 13, 0, 0) # Sell duration end datetime object.
+
+	# The sell_start must be in the future but within 30 days.
+	# The sell_end must be past sell_start, but no more than 6 months later.
+
+	sell_result = browser.sell_asset(result, 1, sell_start, sell_end) # List the NFT for sale using its URL for the price of 1 ETH, and with the start and end sell times above
 
 	if not result:
 		print("Sell failed.")
