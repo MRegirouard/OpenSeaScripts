@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.file_detector import UselessFileDetector
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
-import time
+import time, datetime
 from OpenSeaScripts.AssetOptions import AssetOptions
 
 class OSSBrowser:
@@ -243,13 +243,15 @@ class OSSBrowser:
             print("Error:", e)
             return False
 
-    def sell_asset(self, asset_link:str, price:float):
+    def sell_asset(self, asset_link:str, price:float, start_date:datetime = None, end_date:datetime = None):
         """
         Sell an uploaded asset from the given URL.
 
         Args:
             asset_link (str): The URL of the asset to sell.
             price (float): The price to sell the asset for.
+            start_date (datetime, optional): The start date of the sale.
+            end_date (datetime, optional): The end date of the sale.
 
         Returns:
             True if the asset was sold successfully, False otherwise.
@@ -268,7 +270,59 @@ class OSSBrowser:
 
             self._find_element_timeout(By.CSS_SELECTOR, "input[name='price']").send_keys(str(price)) # Set the price
 
-            # TODO: Set the duration
+            if start_date is not None and end_date is not None: # If there are start and end dates, set them
+                self._find_element_timeout(By.CSS_SELECTOR, "button[id='duration']").click() # Click the duration button
+
+                date_inputs = self._find_elements_timeout(By.CSS_SELECTOR, "input[type='date']") # Get the date inputs
+                start_date_field = date_inputs[0]
+                end_date_field = date_inputs[1]
+
+                start_date_field.click() # Enter the start date
+                start_date_field.send_keys(str(start_date.month).zfill(2))
+                start_date_field.send_keys(str(start_date.day).zfill(2))
+
+                end_date_field.click() # Enter the end date
+                end_date_field.send_keys(str(end_date.month).zfill(2))
+                end_date_field.send_keys(str(end_date.day).zfill(2))
+
+                start_time_field = self._find_element_timeout(By.CSS_SELECTOR, "input[id='start-time']") # Get the time fields
+                end_time_field = self._find_element_timeout(By.CSS_SELECTOR, "input[id='end-time']")
+
+                start_time_field.click() # Enter the start time
+
+                start_hour = start_date.hour # The datetime hour is not how OpenSea interprets the hour, so we need to convert it
+
+                if start_hour == 0: # If the hour is 0, it is 12 AM
+                    start_hour = 12
+                elif start_hour > 12: # If the hour is greater than 12, it is PM
+                    start_hour -= 12
+
+                start_time_field.send_keys(str(start_hour).zfill(2))
+                start_time_field.send_keys(str(start_date.minute).zfill(2))
+
+                if start_date.hour < 12: # Enter AM/PM
+                    start_time_field.send_keys("a")
+                else:
+                    start_time_field.send_keys("p")
+
+                end_time_field.click() # Enter the end time
+
+                end_hour = end_date.hour # The datetime hour is not how OpenSea interprets the hour, so we need to convert it
+
+                if end_date.hour == 0: # If the hour is 0, it is 12 AM
+                    end_hour = 12
+                elif end_date.hour > 12: # If the hour is greater than 12, it is PM
+                    end_hour -= 12
+
+                end_time_field.send_keys(str(end_hour).zfill(2))
+                end_time_field.send_keys(str(end_date.minute).zfill(2))
+
+                if end_date.hour < 12: # Enter AM/PM
+                    end_time_field.send_keys("a")
+                else:
+                    end_time_field.send_keys("p")
+
+                self._find_element_timeout(By.CSS_SELECTOR, "input[name='price']").click() # Click the price field to escape the duration box
 
             self._find_element_timeout(By.CSS_SELECTOR, "button[type='submit']").click() # Click the sell button
 
