@@ -23,7 +23,7 @@ class OSSBrowser:
         service = Service(ChromeDriverManager().install()) # Install the Chrome driver and create a new Service
 
         chrome_options = Options() # Create an Options object to configure the browser
-        
+
         if headless:
             chrome_options.add_argument("--headless") # Add headless argument if headless is True
 
@@ -94,8 +94,8 @@ class OSSBrowser:
         raise Exception("Elements not found") # Raise exception if not found after timeout seconds
 
     def _find_element_content_timeout(self, by:str, value:str, content_text:str, timeout:float = 7, base_delay:float = 0.1):
-        """Find an HTML element with content content_text, waiting up to timeout seconds 
-        for it to appear and delaying base_delay seconds before searching. 
+        """Find an HTML element with content content_text, waiting up to timeout seconds
+        for it to appear and delaying base_delay seconds before searching.
         Uses the Selenium By method to search for value.
 
         Args:
@@ -121,7 +121,7 @@ class OSSBrowser:
                 for element in elements:
                     if element.text == content_text: # Check if element has the correct content
                         return element
-                
+
                 raise Exception("Element not found") # Jump to except if not found
             except:
                 time.sleep(1) # Wait if not found
@@ -145,11 +145,11 @@ class OSSBrowser:
         Returns:
             Boolean: False if the asset was not uploaded.
             str: The URL of the asset if it was uploaded.
-        """        
+        """
 
         try: # Wrap the whole thing in a try/except block to safely return False if errors occur
             if not isinstance(asset_options, AssetOptions):
-                raise ValueError("Asset options must be an instance of AssetOptions") 
+                raise ValueError("Asset options must be an instance of AssetOptions")
 
             self.driver.get(create_link) # Go to the create page
 
@@ -164,7 +164,7 @@ class OSSBrowser:
 
                 if preview_path == "":
                     raise ValueError("Multimedia files need a preview image")
-                
+
                 previewUpload.send_keys(preview_path) # Upload the preview image
 
             self._find_element_timeout(By.ID, "name").send_keys(asset_options.get_name()) # Set the name
@@ -370,7 +370,7 @@ class OSSBrowser:
 
         Returns:
             dict: The session data, containing the command_executor_url and session_id
-        """        
+        """
         return {"command_executor_url": self.driver.command_executor._url, "session_id": self.driver.session_id}
 
     def close(self):
