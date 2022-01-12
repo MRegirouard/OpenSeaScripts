@@ -66,6 +66,15 @@ else:
 	else:
 		print("Asset listed for sale.")
 ```
+### :warning: Sell Duration Limitations
+The sell duration settings may not work as expected. OpenSea's date entry method is quite complicated and this was difficult to overcome in the programming. However, it still may not work well so it is recommended you keep an eye on it or at least test it out with some dates. Here are a few things to keep in mind:
+- Start dates must be in the future, but no more than 30 days in the future.
+- End dates must be past the start date, but no more than 6 months past the start date.
+- The Python module does not check the dates you give it at all, but they will fail on OpenSea. The `sell_asset` function will return `False` in this case.
+- Sometimes, the date selector gets "stuck" on a previous date entered. It's really inconsistent but changing the date on the calendar below the input fields sometimes helps.
+- This may not work for all localities. OpenSea may change the date input order or not in different regions, but this module assumes that OpenSea uses MM/DD/YY as is done in the US.
+- This may not work when dates are in a different year than right now. This feature is currently impossible to test as OpenSea doesn't allow edits to year field as it is currently January and the next year is more than the maximum of 6 months away. OpenSeaScripts does not do anything with the year value you give it, but there's a chance OpenSea figures it out automatically.
+
 ## Easily Reconnect to Existing Browser Session
 Selenium allows you to connect to a previously opened browser session. You can use this to avoid having to sign in to MetaMask each time you run a script to upload NFT's. However, certain things must be done to ensure that the first session stays open.
 <br>
