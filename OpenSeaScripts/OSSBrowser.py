@@ -369,7 +369,7 @@ class OSSBrowser:
         of opening a new browser.
 
         Returns:
-            dict: The session data, containing the command_executor_url and session_id
+            dict: The session data, containing the command_executor_url and session_id.
         """
         return {"command_executor_url": self.driver.command_executor._url, "session_id": self.driver.session_id}
 
